@@ -11,7 +11,7 @@ packages:
     from: 7.0.0
   TDLibKit:
     url: https://github.com/Swiftgram/TDLibKit.git
-    from: 1.5.0
+    branch: main
 
 targets:
   TeleTarg:
