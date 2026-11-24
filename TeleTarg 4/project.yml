@@ -1,0 +1,43 @@
+name: TeleTarg
+options:
+  bundleIdPrefix: com.teletarg
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+
+packages:
+  GRDB:
+    url: https://github.com/groue/GRDB.swift.git
+    from: 7.0.0
+  TDLibKit:
+    url: https://github.com/Swiftgram/TDLibKit.git
+    from: 1.5.0
+
+targets:
+  TeleTarg:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Sources/TeleTarg
+    dependencies:
+      - package: GRDB
+        product: GRDB
+      - package: TDLibKit
+        product: TDLibKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.teletarg.ios
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_CFBundleDisplayName: "TeleTarg"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+        INFOPLIST_KEY_NSFaceIDUsageDescription: "Используется для защиты скрытых чатов TeleTarg."
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "Используется для сохранения медиа и TTL-файлов в галерею."
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Используется для выбора локального аватара и отправки медиа."
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Используется для голосовых сообщений и звонков."
