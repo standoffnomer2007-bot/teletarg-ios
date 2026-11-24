@@ -12,6 +12,57 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Locate project directory
+        id: locate
+        run: |
+          PROJECT_YML=$(find . -maxdepth 3 -name "project.yml" | head -n 1)
+          if [ -z "$PROJECT_YML" ]; then
+            echo "project.yml not found"
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$PROJECT_YML")
+          echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+          echo "Found project directory: $PROJECT_DIR"
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        working-directory: ${{ steps.locate.outputs.dir }}
+        run: xcodegen generate
+
+      - name: Build Unsigned Release .app
+        working-directory: ${{ steps.locate.outputs.dir }}
+        run: |
+          xcodebuild \
+            -project TeleTarg.xcodeproj \
+            -scheme TeleTarg \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package TeleTarg.ipa
+        working-directory: ${{ steps.locate.outputs.dir }}
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/TeleTarg.app Payload/
+          zip -r "$GITHUB_WORKSPACE/TeleTarg.ipa" Payload
+
+      - name: Upload TeleTarg.ipa Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TeleTarg-iOS-IPA
+          path: TeleTarg.ipa:
+  build-ipa:
+    runs-on: macos-15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Unpack TeleTarg_Full_iOS.zip if present
         run: |
           if [ -f "TeleTarg_Full_iOS.zip" ]; then
